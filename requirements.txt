@@ -1,10 +1,8 @@
 numpy
 pandas
 spotipy
-matplotlib
-seaborn
-plotly
 scikit-learn
 scipy
-yellowbrick
 notebook
+Flask
+waitress
