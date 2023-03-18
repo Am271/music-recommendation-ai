@@ -1,24 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
-
 # # **Building Music Recommendation System using Spotify Dataset**
-# 
-# ![image.png](attachment:image.png)
-# 
 # Hello and welcome to my kernel. In this kernel, I have created Music Recommendation System using Spotify Dataset. To do this, I presented some of the visualization processes to understand data and done some EDA(Exploratory Data Analysis) so we can select features that are relevant to create a Recommendation System.
 
 # # **Import Libraries**
-
-# In[3]:
-
-
 import os
 import numpy as np
 import pandas as pd
 
-import seaborn as sns
-import plotly.express as px 
-import matplotlib.pyplot as plt
+# import seaborn as sns
+# import plotly.express as px 
+# import matplotlib.pyplot as plt
 # run_line_magic('matplotlib', 'inline')
 
 from sklearn.cluster import KMeans
@@ -34,38 +26,13 @@ warnings.filterwarnings("ignore")
 
 
 # # **Read Data**
-
-# In[6]:
-
-
 data = pd.read_csv("data.csv")
 genre_data = pd.read_csv('data_by_genres.csv')
 year_data = pd.read_csv('data_by_year.csv')
 
-
-# In[7]:
-
-
 # print(data.info())
 
-
-# In[8]:
-
-
-# print(genre_data.info())
-
-
-# In[9]:
-
-
-# print(year_data.info())
-
-
 # We are going to check for all the analysis with the target as **'popularity'**. Before going to do that let's check for the Feature Correlation by considering a few features and for that, I'm going to use the **yellowbrick** package. You can learn more about it from the [documentation](https://www.scikit-yb.org/en/latest/index.html).
-
-# In[11]:
-
-
 from yellowbrick.target import FeatureCorrelation
 
 feature_names = ['acousticness', 'danceability', 'energy', 'instrumentalness',
@@ -78,26 +45,15 @@ features = np.array(feature_names)
 
 # Instantiate the visualizer
 visualizer = FeatureCorrelation(labels=features)
-
-plt.rcParams['figure.figsize']=(20,20)
 visualizer.fit(X, y)     # Fit the data to the visualizer
 # visualizer.show()
 
 
 # # **Data Understanding by Visualization and EDA**
-
 # # **Music Over Time**
 # 
 # Using the data grouped by year, we can understand how the overall sound of music has changed from 1921 to 2020.
-
-# In[13]:
-
-
 data['year']
-
-
-# In[14]:
-
 
 def get_decade(year):
     period_start = int(year/10) * 10
@@ -106,37 +62,15 @@ def get_decade(year):
 
 data['decade'] = data['year'].apply(get_decade)
 
-sns.set(rc={'figure.figsize':(11 ,6)})
-sns.countplot(data['decade'])
-
-
-# In[15]:
-
-
-sound_features = ['acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'valence']
-fig = px.line(year_data, x='year', y=sound_features)
-fig.show()
-
-
 # # **Characteristics of Different Genres**
 # 
 # This dataset contains the audio features for different songs along with the audio features for different genres. We can use this information to compare different genres and understand their unique differences in sound.
 
-# In[16]:
-
-
 top10_genres = genre_data.nlargest(10, 'popularity')
-
-fig = px.bar(top10_genres, x='genres', y=['valence', 'energy', 'danceability', 'acousticness'], barmode='group')
-# fig.show()
-
 
 # # **Clustering Genres with K-Means**
 # 
 # Here, the simple K-means clustering algorithm is used to divide the genres in this dataset into ten clusters based on the numerical audio features of each genres.
-
-# In[20]:
-
 
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
@@ -146,9 +80,6 @@ cluster_pipeline = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_c
 X = genre_data.select_dtypes(np.number)
 cluster_pipeline.fit(X)
 genre_data['cluster'] = cluster_pipeline.predict(X)
-
-
-# In[21]:
 
 
 # Visualizing the Clusters with t-SNE
@@ -161,16 +92,8 @@ projection = pd.DataFrame(columns=['x', 'y'], data=genre_embedding)
 projection['genres'] = genre_data['genres']
 projection['cluster'] = genre_data['cluster']
 
-fig = px.scatter(
-    projection, x='x', y='y', color='cluster', hover_data=['x', 'y', 'genres'])
-# fig.show()
-
 
 # # **Clustering Songs with K-Means**
-
-# In[23]:
-
-
 song_cluster_pipeline = Pipeline([('scaler', StandardScaler()), 
                                   ('kmeans', KMeans(n_clusters=20, 
                                    verbose=False))
@@ -182,10 +105,6 @@ song_cluster_pipeline.fit(X)
 song_cluster_labels = song_cluster_pipeline.predict(X)
 data['cluster_label'] = song_cluster_labels
 
-
-# In[24]:
-
-
 # Visualizing the Clusters with PCA
 
 from sklearn.decomposition import PCA
@@ -195,11 +114,6 @@ song_embedding = pca_pipeline.fit_transform(X)
 projection = pd.DataFrame(columns=['x', 'y'], data=song_embedding)
 projection['title'] = data['name']
 projection['cluster'] = data['cluster_label']
-
-fig = px.scatter(
-    projection, x='x', y='y', color='cluster', hover_data=['x', 'y', 'title'])
-# fig.show()
-
 
 # # **Build Recommender System**
 # 
