@@ -4,7 +4,6 @@
 # Hello and welcome to my kernel. In this kernel, I have created Music Recommendation System using Spotify Dataset. To do this, I presented some of the visualization processes to understand data and done some EDA(Exploratory Data Analysis) so we can select features that are relevant to create a Recommendation System.
 
 # # **Import Libraries**
-import os
 import numpy as np
 import pandas as pd
 
@@ -13,13 +12,23 @@ import pandas as pd
 # import matplotlib.pyplot as plt
 # run_line_magic('matplotlib', 'inline')
 
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+from collections import defaultdict
+
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
-from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-from sklearn.metrics import euclidean_distances
 from scipy.spatial.distance import cdist
+
+from collections import defaultdict
+from scipy.spatial.distance import cdist
+
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -34,47 +43,41 @@ year_data = pd.read_csv('data_by_year.csv')
 # # **Music Over Time**
 # 
 # Using the data grouped by year, we can understand how the overall sound of music has changed from 1921 to 2020.
-data['year']
+# data['year']
 
-def get_decade(year):
-    period_start = int(year/10) * 10
-    decade = '{}'.format(period_start)
-    return decade
+# def get_decade(year):
+#     period_start = int(year/10) * 10
+#     decade = '{}'.format(period_start)
+#     return decade
 
-data['decade'] = data['year'].apply(get_decade)
+# data['decade'] = data['year'].apply(get_decade)
 
 # # **Characteristics of Different Genres**
 # 
 # This dataset contains the audio features for different songs along with the audio features for different genres. We can use this information to compare different genres and understand their unique differences in sound.
 
-top10_genres = genre_data.nlargest(10, 'popularity')
+# top10_genres = genre_data.nlargest(10, 'popularity')
 
 # # **Clustering Genres with K-Means**
 # 
 # Here, the simple K-means clustering algorithm is used to divide the genres in this dataset into ten clusters based on the numerical audio features of each genres.
 
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-
-cluster_pipeline = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_clusters=15))])
-X = genre_data.select_dtypes(np.number)
-cluster_pipeline.fit(X)
-genre_data['cluster'] = cluster_pipeline.predict(X)
+# cluster_pipeline = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_clusters=15))])
+# X = genre_data.select_dtypes(np.number)
+# cluster_pipeline.fit(X)
+# genre_data['cluster'] = cluster_pipeline.predict(X)
 
 
-# Visualizing the Clusters with t-SNE
+# # Visualizing the Clusters with t-SNE
 
-from sklearn.manifold import TSNE
-
-tsne_pipeline = Pipeline([('scaler', StandardScaler()), ('tsne', TSNE(n_components=2, verbose=1))])
-genre_embedding = tsne_pipeline.fit_transform(X)
-projection = pd.DataFrame(columns=['x', 'y'], data=genre_embedding)
-projection['genres'] = genre_data['genres']
-projection['cluster'] = genre_data['cluster']
+# tsne_pipeline = Pipeline([('scaler', StandardScaler()), ('tsne', TSNE(n_components=2, verbose=1))])
+# genre_embedding = tsne_pipeline.fit_transform(X)
+# projection = pd.DataFrame(columns=['x', 'y'], data=genre_embedding)
+# projection['genres'] = genre_data['genres']
+# projection['cluster'] = genre_data['cluster']
 
 
-# # **Clustering Songs with K-Means**
+# # # **Clustering Songs with K-Means**
 song_cluster_pipeline = Pipeline([('scaler', StandardScaler()), 
                                   ('kmeans', KMeans(n_clusters=20, 
                                    verbose=False))
@@ -86,15 +89,13 @@ song_cluster_pipeline.fit(X)
 song_cluster_labels = song_cluster_pipeline.predict(X)
 data['cluster_label'] = song_cluster_labels
 
-# Visualizing the Clusters with PCA
+# # Visualizing the Clusters with PCA
 
-from sklearn.decomposition import PCA
-
-pca_pipeline = Pipeline([('scaler', StandardScaler()), ('PCA', PCA(n_components=2))])
-song_embedding = pca_pipeline.fit_transform(X)
-projection = pd.DataFrame(columns=['x', 'y'], data=song_embedding)
-projection['title'] = data['name']
-projection['cluster'] = data['cluster_label']
+# pca_pipeline = Pipeline([('scaler', StandardScaler()), ('PCA', PCA(n_components=2))])
+# song_embedding = pca_pipeline.fit_transform(X)
+# projection = pd.DataFrame(columns=['x', 'y'], data=song_embedding)
+# projection['title'] = data['name']
+# projection['cluster'] = data['cluster_label']
 
 # # **Build Recommender System**
 # 
@@ -110,11 +111,6 @@ projection['cluster'] = data['cluster_label']
 
 
 # In[26]:
-
-
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-from collections import defaultdict
 
 client_id = '4f24e3e9bdbf40ffbda7496038221e13'
 secret = 'f9ec8c5073ec422d8910b1be593657a8'
@@ -145,12 +141,6 @@ def find_song(name, year):
 
 
 # In[27]:
-
-
-from collections import defaultdict
-from sklearn.metrics import euclidean_distances
-from scipy.spatial.distance import cdist
-import difflib
 
 number_cols = ['valence', 'year', 'acousticness', 'danceability', 'duration_ms', 'energy', 'explicit',
  'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'popularity', 'speechiness', 'tempo']
