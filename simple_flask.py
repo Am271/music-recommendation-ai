@@ -1,8 +1,13 @@
 from flask import Flask, request
+from waitress import serve
 import recommendation as rec
 import request_year as ry
 
 app = Flask(__name__)
+
+@app.route("/")
+def test_connection():
+    return "<h3>Yes, we are open!</h3>"
 
 @app.route("/recommend")
 def recommend_song():
