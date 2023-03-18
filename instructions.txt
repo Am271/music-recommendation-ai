@@ -1,0 +1,29 @@
+# Steps to setup:
+1. Create the virtual environment if not already created.
+
+python -m venv venv\
+
+# venv is a python module to create virtual environment
+# venv\ is the folder in which the environment will be created
+
+2. Activate the virtual environment
+
+venv\Scripts\activate.bat
+
+3. Install dependencies
+
+pip install requirements.txt
+
+# To start jupyter notebook (after activation)
+
+jupyter notebook
+
+# ALWAYS activate the virtual environment before working
+
+eg:
+
+ venv\Scripts\activate.bat
+
+ jupyter notebook
+
+ python script.py
