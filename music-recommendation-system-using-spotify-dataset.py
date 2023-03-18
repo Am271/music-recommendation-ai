@@ -30,25 +30,6 @@ data = pd.read_csv("data.csv")
 genre_data = pd.read_csv('data_by_genres.csv')
 year_data = pd.read_csv('data_by_year.csv')
 
-# print(data.info())
-
-# We are going to check for all the analysis with the target as **'popularity'**. Before going to do that let's check for the Feature Correlation by considering a few features and for that, I'm going to use the **yellowbrick** package. You can learn more about it from the [documentation](https://www.scikit-yb.org/en/latest/index.html).
-from yellowbrick.target import FeatureCorrelation
-
-feature_names = ['acousticness', 'danceability', 'energy', 'instrumentalness',
-       'liveness', 'loudness', 'speechiness', 'tempo', 'valence','duration_ms','explicit','key','mode','year']
-
-X, y = data[feature_names], data['popularity']
-
-# Create a list of the feature names
-features = np.array(feature_names)
-
-# Instantiate the visualizer
-visualizer = FeatureCorrelation(labels=features)
-visualizer.fit(X, y)     # Fit the data to the visualizer
-# visualizer.show()
-
-
 # # **Data Understanding by Visualization and EDA**
 # # **Music Over Time**
 # 
@@ -198,6 +179,8 @@ def get_mean_vector(song_list, spotify_data):
         song_vector = song_data[number_cols].values
         song_vectors.append(song_vector)  
     
+    song_vectors = [song_data[number_cols].values for song in song_list if get_song_data(song, spotify_data) is not None]
+
     song_matrix = np.array(list(song_vectors))
     return np.mean(song_matrix, axis=0)
 
@@ -235,11 +218,11 @@ def recommend_songs( song_list, spotify_data, n_songs=10):
 # In[ ]:
 
 
-recommend_songs([{'name': 'Come As You Are', 'year':1991},
+print(recommend_songs([{'name': 'Come As You Are', 'year':1991},
                 {'name': 'Smells Like Teen Spirit', 'year': 1991},
                 {'name': 'Lithium', 'year': 1992},
                 {'name': 'All Apologies', 'year': 1993},
-                {'name': 'Stay Away', 'year': 1993}],  data)
+                {'name': 'Stay Away', 'year': 1993}],  data))
 
 
 # * This last cell will gives you a recommendation list of songs like this,
