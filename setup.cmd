@@ -10,16 +10,14 @@ if exist venv\ (
   python -m venv venv\
 )
 
-Rem Activate the virtual environment
-echo Activating virtual environment
-
-venv\Scripts\activate.bat
-
 Rem Install dependencices
 echo Installing dependencies
 
-pip install -r requirements.txt
+venv\Scripts\pip3.exe install -r requirements.txt
 
-echo Everything done!
+Rem Activate the virtual environment
+echo Activating virtual environment
 echo Run 'venv\Scripts\activate.bat' to activate your environment the next time you open a terminal to start working
 echo Run 'jupyter notebook' to start the notebook after activation
+
+venv\Scripts\activate.bat
